@@ -25,34 +25,30 @@ bookings, unreliable payment providers, and asynchronous notifications.
 
 | Module | Role | Key technology | Status |
 |---|---|---|---|
-| `discovery-server` | Service registry | Eureka | Planned |
-| `config-server` | Centralized configuration | Spring Cloud Config | Planned |
+| `customer-service` | Customer profiles (CRUD) | Spring Web, JPA | In progress |
 | `api-gateway` | Single entry point, routing, rate limiting | Spring Cloud Gateway | Planned |
+| `discovery-server` | Service registry | Eureka | Planned |
 | `event-service` | Events and seats catalog | Spring Web, JPA | Planned |
+| `config-server` | Centralized configuration | Spring Cloud Config | Planned |
 | `booking-service` | Booking and seat locking | OpenFeign, Resilience4J | Planned |
 | `payment-service` | Simulated payment provider (random failures) | Resilience4J | Planned |
 | `notification-service` | Confirmation emails/SMS | Kafka consumer | Planned |
-| `customer-service` | Customer profiles | Keycloak, OpenFeign | Planned |
 | `ai-assistant-service` | Natural-language search, recommendations | Spring AI | Later |
-
 ## Roadmap
 
 Each step has a Git tag and a lesson in `docs/lessons/`.
 
-| Tag | Content |
-|---|---|
-| `step-00-setup` | Parent POM, repo structure, CI |
-| `step-01-discovery` | Eureka |
-| `step-02-config` | Config Server |
-| `step-03-event-service` | First business service |
-| `step-04-gateway` | Gateway and routing |
-| `step-05-booking-feign` | booking-service + OpenFeign |
-| `step-06-resilience` | payment-service + Resilience4J |
-| `step-07-kafka` | Events + notification-service |
-| `step-08-saga` | Saga, Outbox, idempotency |
-| `step-09-security` | Keycloak + customer-service |
-| `step-10-observability` | Tracing and metrics |
-| `step-11-ai` | Spring AI |
+| Module | Role | Key technology | Status |
+|---|---|---|---|
+| `customer-service` | Customer profiles (CRUD) | Spring Web, JPA | In progress |
+| `api-gateway` | Single entry point, routing, rate limiting | Spring Cloud Gateway | Planned |
+| `discovery-server` | Service registry | Eureka | Planned |
+| `event-service` | Events and seats catalog | Spring Web, JPA | Planned |
+| `config-server` | Centralized configuration | Spring Cloud Config | Planned |
+| `booking-service` | Booking and seat locking | OpenFeign, Resilience4J | Planned |
+| `payment-service` | Simulated payment provider (random failures) | Resilience4J | Planned |
+| `notification-service` | Confirmation emails/SMS | Kafka consumer | Planned |
+| `ai-assistant-service` | Natural-language search, recommendations | Spring AI | Later |
 
 To follow a lesson, check out its tag: `git checkout step-01-discovery`.
 
