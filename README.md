@@ -25,7 +25,7 @@ bookings, unreliable payment providers, and asynchronous notifications.
 
 | Module | Role | Key technology | Status |
 |---|---|---|---|
-| `customer-service` | Customer profiles (CRUD) | Spring Web, JPA | In progress |
+| `customer-service` | Customer profiles (CRUD) | Spring Web, JPA | Done |
 | `api-gateway` | Single entry point, routing, rate limiting | Spring Cloud Gateway | Planned |
 | `discovery-server` | Service registry | Eureka | Planned |
 | `event-service` | Events and seats catalog | Spring Web, JPA | Planned |
@@ -34,23 +34,28 @@ bookings, unreliable payment providers, and asynchronous notifications.
 | `payment-service` | Simulated payment provider (random failures) | Resilience4J | Planned |
 | `notification-service` | Confirmation emails/SMS | Kafka consumer | Planned |
 | `ai-assistant-service` | Natural-language search, recommendations | Spring AI | Later |
+
 ## Roadmap
 
 Each step has a Git tag and a lesson in `docs/lessons/`.
 
-| Module | Role | Key technology | Status |
-|---|---|---|---|
-| `customer-service` | Customer profiles (CRUD) | Spring Web, JPA | In progress |
-| `api-gateway` | Single entry point, routing, rate limiting | Spring Cloud Gateway | Planned |
-| `discovery-server` | Service registry | Eureka | Planned |
-| `event-service` | Events and seats catalog | Spring Web, JPA | Planned |
-| `config-server` | Centralized configuration | Spring Cloud Config | Planned |
-| `booking-service` | Booking and seat locking | OpenFeign, Resilience4J | Planned |
-| `payment-service` | Simulated payment provider (random failures) | Resilience4J | Planned |
-| `notification-service` | Confirmation emails/SMS | Kafka consumer | Planned |
-| `ai-assistant-service` | Natural-language search, recommendations | Spring AI | Later |
+| Tag | Content |
+|---|---|
+| `step-00-setup` | Parent POM, repo structure, CI |
+| `step-01-customer-service` | First business service |
+| `step-02-gateway-static` | Gateway with static routes |
+| `step-03-discovery` | Eureka + load-balanced routing |
+| `step-04-event-service` | Second business service |
+| `step-05-config` | Config Server |
+| `step-06-booking-feign` | booking-service + OpenFeign |
+| `step-07-resilience` | payment-service + Resilience4J |
+| `step-08-kafka` | Events + notification-service |
+| `step-09-saga` | Saga, Outbox, idempotency |
+| `step-10-security` | Keycloak (customer-service integration) |
+| `step-11-observability` | Tracing and metrics |
+| `step-12-ai` | Spring AI |
 
-To follow a lesson, check out its tag: `git checkout step-01-discovery`.
+To follow a lesson, check out its tag: `git checkout step-01-customer-service`.
 
 ## Tech stack
 
