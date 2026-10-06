@@ -1,0 +1,23 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: discovery-server
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    # This server IS the registry: it must not register itself nor fetch the registry
+    # from another server (otherwise it logs "connection refused" errors at startup).
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhsot:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
