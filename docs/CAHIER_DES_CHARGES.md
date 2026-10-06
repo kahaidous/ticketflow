@@ -124,6 +124,34 @@ Le dépôt doit servir de portfolio technique. Il doit rendre visibles les prati
 
 Les démonstrations et exemples doivent distinguer les compromis d’un environnement pédagogique des exigences d’un système de production. Les choix de paiement simulé, d’authentification, de base de données et de fournisseur IA sont explicitement qualifiés afin que les étudiants puissent en discuter sans les présenter comme des garanties de production.
 
+### Compétences à acquérir et à valoriser
+
+Les compétences ci-dessous sont des **objectifs d’apprentissage**, pas une déclaration que tous les modules existent ou sont déjà maîtrisés. Elles s’acquièrent progressivement en suivant la feuille de route. Pour chaque compétence présentée comme acquise dans un portfolio ou une candidature, l’étudiant doit pouvoir montrer une réalisation présente dans le dépôt et l’expliquer; se référer à la section [État actuel du dépôt](#état-actuel-du-dépôt) pour distinguer l’implémenté du planifié.
+
+#### Parcours principal
+
+| Domaine | Compétences visées | Étapes et preuves à présenter |
+|---|---|---|
+| Java et Spring | Développer des services avec Java 21 et Spring Boot, structurer le code métier, exposer des API REST, valider les entrées et persister les données avec Spring Data JPA. | Socle et services métier; endpoints documentés, tests et gestion cohérente des erreurs. |
+| Microservices et Spring Cloud | Délimiter les responsabilités des services, comprendre la propriété des données et assembler les composants d’un système distribué; configurer Spring Cloud Gateway, Eureka et Spring Cloud Config. | Gateway, découverte et configuration centralisée (étapes 02 à 05 de la roadmap); montrer un routage dynamique et une configuration par profil une fois ces modules réalisés. |
+| REST et OpenFeign | Définir et maintenir des contrats JSON/OpenAPI, choisir entre appel synchrone et événement asynchrone, appeler un service avec un client REST déclaratif et borner les délais d’attente. | Étape `step-06-booking-feign`; contrat et tests d’un échange interservices réel. |
+| Résilience et cohérence distribuée | Traiter les indisponibilités avec timeouts et circuit breakers, limiter les retries aux opérations sûres, rendre les commandes idempotentes et gérer concurrence, saga et compensations. | Étapes `step-07-resilience` et `step-09-saga`; tests reproductibles de panne, de rejeu et de capacité sans survente. |
+| Événementiel avec Kafka | Modéliser des événements, produire et consommer des messages, gérer doublons et erreurs de traitement, et comprendre l’intérêt de l’Outbox. | Étape `step-08-kafka` puis saga; démonstration d’un flux asynchrone et des tests de reprise/idempotence. |
+| Frontend Angular | Construire une interface web de catalogue et de réservation qui consomme les API via le gateway, et traiter les états de chargement, d’erreur et d’indisponibilité. | Module `web-frontend` prévu dans la roadmap; démonstration du parcours utilisateur complet lorsqu’il sera implémenté. |
+| Docker, tests et CI | Conteneuriser les composants, démarrer un environnement reproductible avec Docker Compose, écrire des tests unitaires et d’intégration et vérifier les changements par une CI. | Socle et progression des services; commandes documentées, tests exécutés et pipeline vert. Ajouter les tests de contrat et de bout en bout au fur et à mesure de leur réalisation. |
+| Sécurité et observabilité | Appliquer authentification et autorisation côté serveur, protéger les secrets et données personnelles, puis diagnostiquer un flux grâce aux logs corrélés, métriques et traces. | Étapes `step-10-security` et `step-11-observability`; tests d’accès et démonstration du suivi d’une requête à travers plusieurs services. |
+
+#### Extensions avancées ou optionnelles
+
+- **Telegram** : intégrer le Bot API derrière `ai-assistant-service`, valider et limiter les messages, contrôler les données accessibles et traiter les erreurs du canal externe. Cette extension est planifiée après les fonctions principales; webhook/polling et liaison des comptes restent à décider. Elle ne doit pas être présentée comme une compétence démontrée tant que l’intégration et ses tests ne sont pas dans le dépôt.
+- **IA cloud** : intégrer un fournisseur derrière un adaptateur (Spring AI est une option de la roadmap), maîtriser les réponses en lecture seule et les outils autorisés, et évaluer qualité, coût, disponibilité et confidentialité. Le fournisseur et le modèle ne sont pas encore choisis; cette extension dépend des décisions consignées dans un ADR et de l’étape `step-12-ai`.
+
+#### Présenter le projet sans surévaluer l’avancement
+
+Tant qu’une étape n’est pas construite, la décrire comme **prévue**, **en cours** ou comme un objectif d’apprentissage, et non comme une réalisation ou une expertise acquise. Une formulation possible pour un projet en cours est : « Je construis progressivement TicketFlow, une plateforme de réservation pédagogique, en suivant une roadmap Java/Spring vers les microservices; les modules terminés et leurs tests sont indiqués dans le dépôt. »
+
+Après réalisation, préférer une description vérifiable et précise, par exemple : « J’ai implémenté [module/fonction] avec [technologies], validé par [tests/scénario démontré]; [limite ou étape suivante] reste à faire. » Ne citer que les technologies et résultats effectivement présents dans la version montrée, et distinguer explicitement les extensions Telegram/IA encore optionnelles ou planifiées.
+
 ## Documentation et livrables attendus dans GitHub
 
 Le dépôt doit inclure au minimum :
