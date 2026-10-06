@@ -4,36 +4,16 @@
 
 ```mermaid
 flowchart LR
-    User[Utilisateur / étudiant] -->|navigateur| Angular[Application Angular]
-
-    subgraph Local[Conteneurs Docker Compose]
-        Angular -->|HTTPS / REST JSON| Gateway[API Gateway\nSpring Cloud Gateway]
-        Gateway -->|routes lb://| Customer[customer-service]
-        Gateway -->|routes lb://| Event[event-service]
-        Gateway -->|routes lb://| Booking[booking-service]
-        Gateway -->|routes lb://| Payment[payment-service]
-        Gateway -->|routes lb://| Assistant[ai-assistant-service]
-
-        Eureka[Discovery Server\nEureka : instances enregistrées]
-        Gateway <-->|découverte / routage| Eureka
-        Config[Config Server\nSpring Cloud Config]
-        Config -. configuration centralisée\npour les services .-> Gateway
-
-        Booking -->|OpenFeign / REST| Event
-        Booking -->|OpenFeign / REST| Payment
-        Booking -->|événement réservation| Kafka[(Apache Kafka)]
-        Payment -->|résultat paiement| Kafka
-        Event -->|disponibilité| Kafka
-        Kafka -->|consommation asynchrone| Notification[notification-service]
-
-        Customer --- DB[(Données persistantes\nséparées par service)]
-        Event --- DB
-        Booking --- DB
-        Payment --- DB
-    end
-
-    Telegram[Telegram Bot API] <-->|messages / réponses\nwebhook ou polling à décider| Assistant
-    Assistant -->|requêtes limitées et minimisées| CloudAI[Fournisseur d’IA cloud\nà sélectionner]
+    User[Utilisateur] --> Web[Application Angular]
+    Web --> Gateway[API Gateway]
+    Gateway --> Services["Services métier<br/>clients · événements<br/>réservations · paiements"]
+    Services --> DB[(Bases de données séparées)]
+    Services --> Kafka[(Kafka)]
+    Kafka --> Notifications[Notifications]
+    Gateway --> Assistant[Assistant IA]
+    Assistant <--> Telegram[Telegram]
+    Assistant --> CloudAI[IA cloud]
+    Infra[Eureka + Config Server] -. découverte et configuration .-> Services
 ```
 
 Le schéma décrit la cible, pas l’état déjà déployé. Eureka fournit l’adresse des services; le gateway reste le point d’entrée des clients. OpenFeign est réservé aux échanges synchrones qui ont besoin d’une réponse immédiate, tandis que Kafka transporte les événements qui peuvent être traités en différé. Chaque service métier demeure responsable de ses données. Docker Compose doit permettre de démarrer l’application et ses dépendances locales; Telegram et le fournisseur d’IA restent des services externes appelés par `ai-assistant-service`.
