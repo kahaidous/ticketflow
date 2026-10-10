@@ -1,4 +1,12 @@
 services:
+  discovery-server:
+    build:
+      context: ..
+      dockerfile: services/discovery-server/Dockerfile
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+
   customer-service:
     build:
       context: ..
@@ -6,6 +14,11 @@ services:
     container_name: customer-service
     ports:
       - "8081:8081"
+    environment:
+      # Inside the Compose network, Eureka is reached by its service name, never by localhost
+      EUREKA_URL: http://discovery-server:8761/eureka/
+    depends_on:
+      - discovery-server
 
   api-gateway:
     build:
@@ -15,7 +28,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Static wiring: inside the Compose network the service is reached by its container name
-      CUSTOMER_SERVICE_URL: http://customer-service:8081
+      # No more static URL: the gateway finds customer-service through Eureka (lb://)
+      EUREKA_URL: http://discovery-server:8761/eureka/
     depends_on:
-      - customer-service
+      - discovery-server
