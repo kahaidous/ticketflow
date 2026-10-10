@@ -23,8 +23,14 @@ import org.springframework.test.context.DynamicPropertySource;
 /**
  * Starts the gateway on a random port and a tiny stub HTTP server standing in for
  * customer-service, so the routing can be tested without running the real service.
+ *
+ * <p>Eureka is disabled: the route uses "lb://customer-service", and the name is resolved
+ * by the in-memory SimpleDiscoveryClient from the properties declared below instead of
+ * the real Eureka server.
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "eureka.client.enabled=false")
 class GatewayRoutingTest {
 
     private static final AtomicReference<String> lastBackendPath = new AtomicReference<>();
@@ -51,7 +57,9 @@ class GatewayRoutingTest {
 
     @DynamicPropertySource
     static void backendUrl(DynamicPropertyRegistry registry) {
-        registry.add("customer-service.url", () -> "http://127.0.0.1:" + backend.getAddress().getPort());
+        // Declares the stub as the one and only instance of "customer-service"
+        registry.add("spring.cloud.discovery.client.simple.instances.customer-service[0].uri",
+                () -> "http://127.0.0.1:" + backend.getAddress().getPort());
     }
 
     @AfterAll
@@ -61,6 +69,9 @@ class GatewayRoutingTest {
 
     @Value("${local.server.port}")
     int port;
+
+    @Value("${spring.cloud.gateway.server.webflux.routes[0].uri}")
+    String customerRouteUri;
 
     private final HttpClient client = HttpClient.newHttpClient();
 
@@ -85,6 +96,11 @@ class GatewayRoutingTest {
         HttpResponse<String> response = get("/api/customers");
 
         assertThat(response.headers().firstValue("X-Served-By")).contains("api-gateway");
+    }
+
+    @Test
+    void customerRouteIsLoadBalancedThroughDiscovery() {
+        assertThat(customerRouteUri).isEqualTo("lb://customer-service");
     }
 
     @Test
