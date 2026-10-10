@@ -6,30 +6,40 @@
 		<groupId>com.ticketflow</groupId>
 		<artifactId>ticketflow-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
+		<relativePath>./../../pom.xml</relativePath> <!-- lookup parent from repository -->
 	</parent>
-	<artifactId>api-gateway</artifactId>
-	<name>api-gateway</name>
-	<description>Single entry point: routing and filters (Spring Cloud Gateway, WebFlux)</description>
+	<groupId>com.ticketflow</groupId>
+	<artifactId>discovery-server</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>discovery-server</name>
+	<description>discovery-server</description>
+	<url/>
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
+			<artifactId>spring-boot-starter-actuator-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

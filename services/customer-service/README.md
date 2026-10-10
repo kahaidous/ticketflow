@@ -10,7 +10,7 @@ this service only manages the business profile.
 ## Overview
 - **Port:** 8081
 - **Database:** H2 in-memory (recreated on every start)
-- **Depends on:** nothing
+- **Depends on:** `discovery-server` (8761), only to register itself; the API works without it
 
 | Method | Path | Description |
 |---|---|---|
@@ -19,6 +19,18 @@ this service only manages the business profile.
 | GET | `/api/customers` | List customers |
 | PUT | `/api/customers/{id}` | Update a customer |
 | DELETE | `/api/customers/{id}` | Delete a customer |
+
+## Service discovery
+Since `step-03-discovery` the service registers itself in Eureka under the name
+`customer-service` (the value of `spring.application.name`). This is the name the
+gateway uses in `lb://customer-service`, so nobody needs to know its host or port.
+
+- Eureka address: `eureka.client.service-url.defaultZone`, overridable with the
+  `EUREKA_URL` environment variable (default `http://localhost:8761/eureka/`).
+- `eureka.instance.prefer-ip-address=true` registers the IP instead of the machine
+  name, which avoids name-resolution problems in containers.
+- If Eureka is not running, the service still starts and answers on 8081; it only
+  logs registration errors.
 
 Errors follow RFC 9457 (`ProblemDetail`): 400 validation, 404 not found, 409 duplicate email.
 
@@ -31,6 +43,9 @@ Errors follow RFC 9457 (`ProblemDetail`): 400 validation, 404 not found, 409 dup
     exceptions/    domain exceptions and their HTTP mapping
 
 ## Run locally
+Optional: start the registry first (`./mvnw -pl services/discovery-server spring-boot:run`)
+and look for `CUSTOMER-SERVICE` on http://localhost:8761 (up to ~30 s).
+
     ./mvnw -pl services/customer-service spring-boot:run
 
     curl -i -X POST localhost:8081/api/customers \
@@ -42,6 +57,8 @@ Errors follow RFC 9457 (`ProblemDetail`): 400 validation, 404 not found, 409 dup
 
 ## Run the tests
     ./mvnw -pl services/customer-service test
+
+Tests run with `eureka.client.enabled=false`, so no registry is needed.
 
 ## Exercise
 1. Add a `GET /api/customers?email=...` search endpoint with a test.

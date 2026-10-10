@@ -15,11 +15,12 @@ spring:
           routes:
             - id: customer-service            # unique name of the route (used in logs and in /actuator/gateway/routes)
 
-              # STATIC target: the backend address is written here (or injected through the
-              # customer-service.url property / CUSTOMER_SERVICE_URL environment variable).
-              # The gateway has no idea how many instances exist: that is the pain point
-              # that Eureka solves in step-03-discovery (uri: lb://customer-service).
-              uri: ${customer-service.url:http://localhost:8081}
+              # DYNAMIC target (step-03): "lb://" means "load-balanced". The gateway does NOT
+              # know any host or port: it asks Eureka for the instances registered under the
+              # name "customer-service" and picks one for each request (round-robin).
+              # Start a second instance and the traffic is shared with no config change.
+              # (Step-02 used a static address: uri: http://localhost:8081)
+              uri: lb://customer-service
 
               # PREDICATES = the conditions that decide whether an incoming request matches
               # this route. If several predicates are listed, ALL of them must be true (AND).
@@ -44,7 +45,18 @@ spring:
               filters:
                 - AddResponseHeader=X-Served-By, api-gateway   # add a header to the response
 
+eureka:
+  client:
+    service-url:
+      # Where the Eureka server is. Overridden by EUREKA_URL in Docker Compose.
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
 management:
+  endpoint:
+    gateway:
+      access: read_only
   endpoints:
     web:
       exposure:
