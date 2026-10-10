@@ -24,8 +24,8 @@ import org.springframework.test.context.DynamicPropertySource;
  * Starts the gateway on a random port and a tiny stub HTTP server standing in for
  * customer-service, so the routing can be tested without running the real service.
  *
- * <p>Eureka is disabled: the route uses "lb://customer-service", and the name is resolved
- * by the in-memory SimpleDiscoveryClient from the properties declared below instead of
+ * <p>Eureka is disabled: the discovery locator builds the route /customer-service/** from
+ * the services known to the in-memory SimpleDiscoveryClient (declared below) instead of
  * the real Eureka server.
  */
 @SpringBootTest(
@@ -70,9 +70,6 @@ class GatewayRoutingTest {
     @Value("${local.server.port}")
     int port;
 
-    @Value("${spring.cloud.gateway.server.webflux.routes[0].uri}")
-    String customerRouteUri;
-
     private final HttpClient client = HttpClient.newHttpClient();
 
     private HttpResponse<String> get(String path) throws Exception {
@@ -84,7 +81,7 @@ class GatewayRoutingTest {
 
     @Test
     void forwardsCustomerRequestsToTheBackend() throws Exception {
-        HttpResponse<String> response = get("/api/customers/1");
+        HttpResponse<String> response = get("/customer-service/api/customers/1");
 
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(response.body()).contains("Sara");
@@ -93,14 +90,15 @@ class GatewayRoutingTest {
 
     @Test
     void addsTheGatewayResponseHeader() throws Exception {
-        HttpResponse<String> response = get("/api/customers");
+        HttpResponse<String> response = get("/customer-service/api/customers");
 
         assertThat(response.headers().firstValue("X-Served-By")).contains("api-gateway");
     }
 
     @Test
-    void customerRouteIsLoadBalancedThroughDiscovery() {
-        assertThat(customerRouteUri).isEqualTo("lb://customer-service");
+    void servicesAreOnlyReachableThroughTheirServiceName() throws Exception {
+        // The locator builds /{service-name}/** : the bare /api/customers has no route
+        assertThat(get("/api/customers").statusCode()).isEqualTo(404);
     }
 
     @Test

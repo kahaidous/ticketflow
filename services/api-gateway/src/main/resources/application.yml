@@ -8,42 +8,40 @@ spring:
     gateway:
       server:
         webflux:
-          # A ROUTE is the basic building block of the gateway. It answers 3 questions:
-          #   1. WHERE to send the request  -> id + uri
-          #   2. WHEN does this route apply -> predicates
-          #   3. WHAT to change on the way  -> filters
-          routes:
-            - id: customer-service            # unique name of the route (used in logs and in /actuator/gateway/routes)
+          # DISCOVERY LOCATOR (step-03): instead of writing one route per service, the gateway
+          # asks Eureka which services exist and creates a route for each of them, on its own.
+          # For a service registered as "customer-service" it builds:
+          #   predicate -> Path=/customer-service/**
+          #   target    -> lb://customer-service   (load-balanced over all its instances)
+          #   filter    -> RewritePath that removes the "/customer-service" prefix
+          # so GET /customer-service/api/customers on the gateway reaches GET /api/customers
+          # on the service. A new microservice becomes reachable with NO change here.
+          # Eureka registers names in UPPER CASE: lower-case-service-id keeps the URLs readable.
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
 
-              # DYNAMIC target (step-03): "lb://" means "load-balanced". The gateway does NOT
-              # know any host or port: it asks Eureka for the instances registered under the
-              # name "customer-service" and picks one for each request (round-robin).
-              # Start a second instance and the traffic is shared with no config change.
-              # (Step-02 used a static address: uri: http://localhost:8081)
-              uri: lb://customer-service
+          # DEFAULT FILTERS are applied to every route, including the ones created by the
+          # locator. FILTERS = actions applied to the request BEFORE it is sent to the backend
+          # and/or to the response BEFORE it is returned to the client.
+          # Other common filters:
+          #   - AddRequestHeader=X-Request-Source, gateway   add a header to the request
+          #   - Retry / CircuitBreaker / RequestRateLimiter  resilience filters (later steps)
+          default-filters:
+            - AddResponseHeader=X-Served-By, api-gateway
 
-              # PREDICATES = the conditions that decide whether an incoming request matches
-              # this route. If several predicates are listed, ALL of them must be true (AND).
-              # If no route matches, the gateway answers 404.
-              # Other common predicates:
-              #   - Method=GET,POST           match on the HTTP method
-              #   - Header=X-Api-Version, 1   match on a request header
-              #   - Query=page                match when a query parameter is present
-              #   - Host=**.ticketflow.com    match on the Host header
-              #   - After=2026-01-01T00:00:00+01:00[Africa/Casablanca]   match after a date
-              predicates:
-                - Path=/api/customers/**      # any URL starting with /api/customers
-
-              # FILTERS = actions applied to the request BEFORE it is sent to the backend
-              # and/or to the response BEFORE it is returned to the client. They run in the
-              # order they are listed.
-              # Other common filters:
-              #   - AddRequestHeader=X-Request-Source, gateway   add a header to the request
-              #   - StripPrefix=1               remove the first path segment (/api/customers -> /customers)
-              #   - RewritePath=/api/(?<rest>.*), /${rest}       rewrite the path with a regex
-              #   - Retry / CircuitBreaker / RequestRateLimiter  resilience filters (later steps)
-              filters:
-                - AddResponseHeader=X-Served-By, api-gateway   # add a header to the response
+          # The same thing written by hand (explicit route, as in step-02 but with lb://).
+          # Use explicit routes when you want full control over what is exposed and how:
+          # a ROUTE answers 3 questions: WHERE (id + uri), WHEN (predicates), WHAT (filters).
+          #
+          # routes:
+          #   - id: customer-service
+          #     uri: lb://customer-service
+          #     predicates:
+          #       - Path=/api/customers/**       # all predicates must match (AND); no match -> 404
+          #     filters:
+          #       - AddResponseHeader=X-Served-By, api-gateway
 
 eureka:
   client:

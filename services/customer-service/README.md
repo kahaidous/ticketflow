@@ -19,11 +19,12 @@ this service only manages the business profile.
 | GET | `/api/customers` | List customers |
 | PUT | `/api/customers/{id}` | Update a customer |
 | DELETE | `/api/customers/{id}` | Delete a customer |
+| GET | `/api/customers/whoami` | Which instance answered (service name + port), for the load-balancing demo |
 
 ## Service discovery
 Since `step-03-discovery` the service registers itself in Eureka under the name
 `customer-service` (the value of `spring.application.name`). This is the name the
-gateway uses in `lb://customer-service`, so nobody needs to know its host or port.
+gateway uses in the URL (`/customer-service/...`) and in `lb://customer-service`, so nobody needs to know its host or port.
 
 - Eureka address: `eureka.client.service-url.defaultZone`, overridable with the
   `EUREKA_URL` environment variable (default `http://localhost:8761/eureka/`).
