@@ -59,6 +59,34 @@ gateway knows about:
 
     curl localhost:8080/actuator/gateway/routes
 
+## Load balancing demo
+Because the route is `lb://customer-service`, the gateway spreads requests over
+**every** registered instance of the service, with no configuration change.
+
+Start the registry, two instances of customer-service (on different ports) and the gateway:
+
+    ./mvnw -pl services/discovery-server spring-boot:run
+    ./mvnw -pl services/customer-service spring-boot:run
+    ./mvnw -pl services/customer-service spring-boot:run -Dspring-boot.run.arguments=--server.port=8083
+    ./mvnw -pl services/api-gateway spring-boot:run
+
+On http://localhost:8761, `CUSTOMER-SERVICE` now lists **2 instances**. Wait about
+30 s so the gateway refreshes its copy of the registry, then call the `whoami`
+endpoint through the gateway several times:
+
+    for i in 1 2 3 4 5 6; do curl -s localhost:8080/api/customers/whoami; echo; done
+
+Expected output: the port alternates between the two instances (round-robin).
+
+    {"service":"customer-service","port":"8081"}
+    {"service":"customer-service","port":"8083"}
+    {"service":"customer-service","port":"8081"}
+    ...
+
+Now stop the instance on 8083 (Ctrl+C) and repeat the loop. For a short while some
+calls fail, then everything is served by 8081 once Eureka removes the dead instance.
+That delay is the price of a registry that is only eventually consistent.
+
 ## Run with Docker
     docker compose -f infra/docker-compose.yml up --build
 

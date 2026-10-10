@@ -19,6 +19,7 @@ this service only manages the business profile.
 | GET | `/api/customers` | List customers |
 | PUT | `/api/customers/{id}` | Update a customer |
 | DELETE | `/api/customers/{id}` | Delete a customer |
+| GET | `/api/customers/whoami` | Which instance answered (service name + port), for the load-balancing demo |
 
 ## Service discovery
 Since `step-03-discovery` the service registers itself in Eureka under the name
